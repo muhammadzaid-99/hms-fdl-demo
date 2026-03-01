@@ -104,8 +104,8 @@ window.addEventListener('load', drawConnectors);
 window.addEventListener('resize', drawConnectors);
 
 // ===== HELPERS =====
-function comp(iconName, name, desc, cls = 'blue') {
-    return `<div class="comp-item ${cls}">
+function comp(iconName, name, desc, cls = 'blue', grid_cols = '1') {
+    return `<div class="comp-item ${cls}" style="grid-column: span ${grid_cols}">
         <div class="comp-icon ${cls}">${icon(iconName, 'i-sm')}</div>
         <div><div class="comp-name">${name}</div><div class="comp-desc">${desc}</div></div>
     </div>`;
@@ -149,7 +149,7 @@ modalContent['central'] = `
 
         <div class="m-section">
             <div class="m-section-head blue">${icon('zap', 'i-sm')} Data Flows</div>
-            ${flow('f-c-api', 'Portal / API Request Flow', [
+            ${flow('f-c-api', 'Metadata Request Flow', [
     ['User Request →', 'Central Backend'],
     ['Central Backend →', 'Central Proxy'],
     ['Central Proxy →', 'Nessie Catalog (metadata lookup)'],
@@ -174,6 +174,16 @@ modalContent['central'] = `
     ['Approval →', 'sent back to Central Backend'],
     ['Requester →', 'gains scoped data access for Trino query execution'],
 ])}
+            ${flow('f-c-analytics', 'Analytics Data Flow', [
+    ['Requester Platform →', 'attaches session ID and sends filter parameters'],
+    ['Central Middleware →', 'extracts session ID to guarantee strict data isolation per researcher'],
+    ['In-Memory Data Engine →', 'applies dynamic slicing masks to session dataframe (demographics, dates, diagnoses)'],
+    ['Analytics (Overview) →', 'computes KPIs, distributions, pivot tables, and rule-based insights'],
+    ['Analytics (Trends) →', 'executes time-series forecasting and Z-score anomaly detection'],
+    ['Analytics (Explorer) →', 'generates Pearson correlation matrices and KMeans clustering'],
+    ['Central API Gateway →', 'serializes data structures and applies cross-origin policies'],
+    ['Requester Platform →', 'receives structured insights and renders interactive visualizations'],
+])}
         </div>
     </div>
     
@@ -181,13 +191,13 @@ modalContent['central'] = `
         <div class="m-section">
             <div class="m-section-head blue">${icon('server', 'i-sm')} Internal Components</div>
             <div class="comp-grid">
-                ${comp('server', 'Central Backend', 'Main app server — auth, business logic, request management')}
-                ${comp('globe', 'Central Proxy', 'Internal gateway — routes to Nessie, Trino, hospital MinIO buckets')}
-                ${comp('brain', 'Data / AI Analytics Service', 'ML models &amp; AI analytics on federated data', 'purple')}
-                ${comp('gitBranch', 'Nessie Catalog Server', 'Apache Nessie — Git-like Iceberg metadata catalog (hospital nodes have push-only access)')}
-                ${comp('database', 'Nessie PostgreSQL', 'Backing database for Nessie catalog')}
-                ${comp('database', 'Central PostgreSQL', 'App database — users, requests, audit logs')}
-                ${comp('cpu', 'Trino Engine', 'Distributed SQL query engine — federated queries across hospital data lakes')}
+            ${comp('server', 'Central Backend', 'Main app server — auth, business logic, request management')}
+            ${comp('globe', 'Central Proxy', 'Internal gateway — routes to Nessie, Trino, hospital MinIO buckets')}
+            ${comp('brain', 'Data / AI Analytics Service', 'ML models &amp; AI analytics on federated data', 'purple', '2')}
+            ${comp('gitBranch', 'Nessie Catalog Server', 'Apache Nessie — Git-like Iceberg metadata catalog (hospital nodes have push-only access)')}
+            ${comp('database', 'Nessie PostgreSQL', 'Backing database for Nessie catalog')}
+            ${comp('database', 'Central PostgreSQL', 'App database — users, requests, audit logs')}
+            ${comp('cpu', 'Trino Engine', 'Distributed SQL query engine — federated queries across hospital data lakes')}
             </div>
         </div>
     </div>
@@ -200,96 +210,157 @@ function hospitalModal(label, sfx, backendUrl, adminUrl, clinicalUrl) {
 <h2 class="m-title teal">Hospital ${label}</h2>
 <p class="m-sub">Independent hospital data node — identical deployment, independent credentials &amp; URLs</p>
 
-<div class="modal-cols">
-    <!-- LEFT COLUMN: Clinical operations & source systems -->
-    <div class="modal-col">
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('stethoscope', 'i-sm')} Clinical System Layer</div>
-            <div class="m-portals cols-1">
-                ${portal('shield', 'Admin Portal (Clinical)', 'Hospital system admin — manage users, roles &amp; system configuration.', adminUrl, 'teal')}
-                ${portal('users', 'Clinical Staff Portal', 'Multi-role portal for clinical operations.', clinicalUrl, 'teal', `
-                    <div class="role-list">
-                        <span class="role-badge">Doctor</span>
-                        <span class="role-badge">Patient</span>
-                        <span class="role-badge">Receptionist</span>
-                        <span class="role-badge">Pathologist</span>
-                        <span class="role-badge">Lab Technician</span>
-                    </div>`)}
+<!-- TABS / LAYER NAV -->
+<div class="layer-nav">
+    <button class="layer-btn active" onclick="switchLayer('${sfx}', 'clinical')">${icon('stethoscope', 'i-sm')} Clinical System Layer</button>
+    <button class="layer-btn" onclick="switchLayer('${sfx}', 'infra')">${icon('hardDrive', 'i-sm')} Node Infrastructure Layer</button>
+</div>
+
+<!-- CLINICAL SYSTEM LAYER -->
+<div id="layer-${sfx}-clinical" class="layer-content">
+    <div class="modal-cols">
+        <!-- Col 1: Access & Components -->
+        <div class="modal-col">
+            <div class="m-section">
+                <div class="m-section-head teal">${icon('stethoscope', 'i-sm')} Portals</div>
+                <div class="m-portals cols-1">
+                    ${portal('shield', 'Admin Portal (Clinical)', 'Hospital system admin — manage users, roles &amp; system configuration.', adminUrl, 'teal')}
+                    ${portal('users', 'Clinical Staff Portal', 'Multi-role portal for clinical operations.', clinicalUrl, 'teal', `
+                        <div class="role-list">
+                            <span class="role-badge">Doctor</span>
+                            <span class="role-badge">Patient</span>
+                            <span class="role-badge">Receptionist</span>
+                            <span class="role-badge">Pathologist</span>
+                            <span class="role-badge">Lab Technician</span>
+                        </div>`)}
+                </div>
+            </div>
+
+            <div class="m-section">
+                <div class="m-section-head teal">${icon('server', 'i-sm')} Clinical Components</div>
+                <div class="comp-grid">
+                    ${comp('server', 'Main Clinical Backend', 'Auth layer &amp; API gateway for operations', 'teal')}
+                    ${comp('clipboard', 'Checkups Service', 'Patient checkups, appointments &amp; scheduling', 'teal')}
+                    ${comp('clipboard', 'Lab Tests Service', 'Manage lab tests templates, perform tests &amp; store results', 'teal')}
+                    ${comp('database', 'Clinical DB', 'Source database for ETL pipelines', 'teal')}
+                </div>
             </div>
         </div>
 
-        <div class="m-section">
-            <div class="m-section-head purple">${icon('brain', 'i-sm')} AI Services</div>
-            <div class="comp-grid" style="grid-template-columns: 1fr;">
-                ${comp('mic', 'Transcription Service', 'Speech-to-text pipeline — processes checkup audio', 'purple')}
-                ${comp('sparkles', 'Clinical Insights Service', 'NLP models — extracts insights &amp; anomalies', 'purple')}
+        <!-- Col 2: AI & Flows -->
+        <div class="modal-col">
+            <div class="m-section">
+                <div class="m-section-head purple">${icon('brain', 'i-sm')} AI Services</div>
+                <div class="comp-grid" style="grid-template-columns: 1fr;">
+                    ${comp('mic', 'Transcription Service', 'Whisper Large v3 Turbo (GGUF) — converts checkup audio to text', 'purple')}
+                    ${comp('sparkles', 'Clinical Insights Service', 'MedGemma 3 1B — extracts 12-field structured clinical data', 'purple')}
+                    ${comp('clipboard', 'Patient History Summarization', 'MedGemma — synthesizes longitudinal data from past checkups', 'purple')}
+                    ${comp('cpu', 'Plug &amp; Play Model Hub', 'VQA &amp; BioGPT — auto-loading dynamic inference routing', 'purple')}
+                </div>
             </div>
-        </div>
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('server', 'i-sm')} Clinical Components</div>
-            <div class="comp-grid">
-                ${comp('server', 'Main Clinical Backend', 'Auth layer &amp; API gateway for operations', 'teal')}
-                ${comp('clipboard', 'Checkups Service', 'Patient checkups, appointments &amp; scheduling', 'teal')}
-                ${comp('clipboard', 'Lab Tests Service', 'Manage lab tests templates, perform tests &amp; store results', 'teal')}
-                ${comp('database', 'Clinical DB', 'Source database for ETL pipelines', 'teal')}
-            </div>
-        </div>
 
-
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('zap', 'i-sm')} Clinical Data Flow</div>
-            ${flow('f-' + sfx + '-clin', 'Clinical System Data Flow', [
+            <div class="m-section" style="max-height: 480px; overflow-y: auto; padding-right: 15px;">
+                <div class="m-section-head teal">${icon('zap', 'i-sm')} AI &amp; Clinical Data Flows</div>
+                ${flow('f-' + sfx + '-transcribe', 'Clinical Transcription Flow', [
+        ['Frontend →', 'sends audio file + previous checkup data'],
+        ['Python Server →', 'saves temp audio file'],
+        ['WhisperHandler →', 'loads Whisper v3 Turbo (GGUF); auto-detects English/Urdu and transcribes'],
+        ['MedGemmaHandler →', 'receives transcription; extracts structured 12-field clinical data'],
+        ['MedGemmaHandler →', 'runs Gap Analysis to verify missing/incomplete data'],
+        ['Python Server →', 'returns { transcription, extracted_info, gap_analysis }'],
+    ], true)}
+                ${flow('f-' + sfx + '-history', 'Patient History Summarization Flow', [
+        ['Frontend →', 'requests checkup history summary (patient + checkup array)'],
+        ['Python Server →', 'validates inputs &amp; formats prompt template'],
+        ['MedGemmaHandler →', 'synthesizes condition progression, symptom trends &amp; treatment response'],
+        ['Python Server →', 'returns structured narrative summary view'],
+    ], true)}
+                ${flow('f-' + sfx + '-pnp', 'Plug & Play Model Run Flow', [
+        ['Frontend →', 'fetches unverified manifest objects'],
+        ['Python Server →', 'verifies local model directory; marks online/offline dynamically'],
+        ['Frontend →', 'renders dynamic cards/inputs based on manifest type'],
+        ['User Submits →', 'requests model inference (passes text/audio/image)'],
+        ['Python Server →', 'reads container field (whisper, medgemma, blip, biogpt)'],
+        ['Model Handler →', 'lazy-loads model on first run; caches in memory'],
+        ['Inference →', 'returns standardized { output: { text } } payload'],
+        ['Daemon →', 'unloads model &amp; frees GPU/CPU if idle > 10m'],
+    ], true)}
+                ${flow('f-' + sfx + '-clin', 'Core Clinical System Data Flow', [
         ['Staff Portal →', 'Main Clinical Backend'],
         ['→ Checkups Service', '(appointments, audio recording)'],
         ['  → AI Services', '(transcription &amp; insights)'],
         ['→ Clinical PostgreSQL', '(data persistence)'],
         ['ETL Pipeline:', 'Clinical DB → ETL Server → MinIO Data Lake'],
     ], true)}
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- RIGHT COLUMN: Infrastructure & Integration -->
-    <div class="modal-col">
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('hardDrive', 'i-sm')} Node Infrastructure Layer</div>
-            <div class="m-portals cols-1">
-                ${portal('monitor', 'Node Backend UI', 'Manage ETL pipelines, federation credentials &amp; data access requests.', backendUrl, 'teal')}
+<!-- INFRASTRUCTURE LAYER -->
+<div id="layer-${sfx}-infra" class="layer-content hidden">
+    <div class="modal-cols">
+        <!-- Col 1: Access & Components -->
+        <div class="modal-col">
+            <div class="m-section">
+                <div class="m-section-head teal">${icon('hardDrive', 'i-sm')} Portals</div>
+                <div class="m-portals cols-1">
+                    ${portal('monitor', 'Node Console', 'Manage ETL pipelines, federation credentials &amp; data access requests.', backendUrl, 'teal')}
+                </div>
+            </div>
+
+            <div class="m-section">
+                <div class="m-section-head teal">${icon('server', 'i-sm')} Infrastructure Components</div>
+                <div class="comp-grid">
+                    ${comp('server', 'Node Backend', 'ETL management, central polling', 'teal')}
+                    ${comp('database', 'Node Config DB', 'Node config storage (no clinical data)', 'teal')}
+                    ${comp('zap', 'ETL Server', 'Local ETL engine', 'teal')}
+                    ${comp('hardDrive', 'MinIO Data Lake', 'S3 object storage (Apache Iceberg)', 'teal')}
+                </div>
+                <div class="partition-box">
+                    <strong>Data Lake Partitioning:</strong><br>
+                    └── /{department}/<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└── /{checkup_date}/<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── [Iceberg files]<br>
+                </div>
             </div>
         </div>
 
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('server', 'i-sm')} Infrastructure Components</div>
-            <div class="comp-grid">
-                ${comp('server', 'Node Backend', 'ETL management, central polling', 'teal')}
-                ${comp('database', 'Node Config DB', 'Node config storage (no clinical data)', 'teal')}
-                ${comp('zap', 'ETL Server', 'Local ETL engine', 'teal')}
-                ${comp('hardDrive', 'MinIO Data Lake', 'S3 object storage (Apache Iceberg)', 'teal')}
-            </div>
-            <div class="partition-box">
-                <strong>Data Lake Partitioning:</strong><br>
-                └── /{department}/<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;└── /{checkup_date}/<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── [Iceberg files]<br>
-            </div>
-        </div>
-
-        <div class="m-section">
-            <div class="m-section-head teal">${icon('zap', 'i-sm')} Infrastructure Data Flows</div>
-            ${flow('f-' + sfx + '-etl', 'ETL Pipeline Execution Flow', [
+        <!-- Col 2: Data Flows -->
+        <div class="modal-col">
+            <div class="m-section">
+                <div class="m-section-head teal">${icon('zap', 'i-sm')} Infrastructure Data Flows</div>
+                ${flow('f-' + sfx + '-etl', 'ETL Pipeline Execution Flow', [
         ['Node Backend UI →', 'triggers ETL job'],
         ['ETL Server →', 'reads from Clinical DB'],
         ['ETL Server →', 'writes Iceberg data to MinIO'],
         ['ETL Server →', 'pushes metadata to Central Nessie Catalog'],
     ], true)}
-            ${flow('f-' + sfx + '-req', 'Data Request Management Flow', [
+                ${flow('f-' + sfx + '-req', 'Data Request Management Flow', [
         ['Node Backend →', 'polls pending requests from Central'],
         ['Admin →', 'reviews &amp; approves, issues temp STS credentials'],
         ['Approval →', 'sent back to Central Backend'],
     ], true)}
+            </div>
         </div>
     </div>
 </div>`;
 }
+
+// Helper to switch layers without page reloads/scrolling
+window.switchLayer = function (sfx, target) {
+    document.getElementById(`layer-${sfx}-clinical`).classList.add('hidden');
+    document.getElementById(`layer-${sfx}-infra`).classList.add('hidden');
+
+    document.getElementById(`layer-${sfx}-${target}`).classList.remove('hidden');
+
+    // Toggle active state on buttons
+    const btns = document.querySelectorAll('.layer-btn');
+    btns.forEach(b => b.classList.remove('active'));
+
+    const activeBtn = Array.from(btns).find(b => b.getAttribute('onclick').includes(target));
+    if (activeBtn) activeBtn.classList.add('active');
+};
 
 modalContent['hospital-a'] = hospitalModal('Node A', 'a', 'https://console.h1.healthlake.tech', 'https://admin.h1.healthlake.tech', 'https://portal.h1.healthlake.tech');
 modalContent['hospital-b'] = hospitalModal('Node B', 'b', 'https://console.h2.healthlake.tech', 'https://admin.h2.healthlake.tech', 'https://portal.h2.healthlake.tech');

@@ -533,6 +533,48 @@ body::before {
     gap: 0;
 }
 
+/* Modal Layer Nav (Tabs) */
+.layer-nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.layer-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 0.8rem 1rem;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all var(--transition);
+}
+
+.layer-btn:hover {
+    color: var(--teal);
+}
+
+.layer-btn.active {
+    color: var(--teal);
+    border-bottom-color: var(--teal);
+}
+
+.layer-content {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.layer-content.hidden {
+    display: none;
+}
+
 
 
 @keyframes slideUp {
@@ -642,11 +684,14 @@ body::before {
     border-left: 3px solid var(--border);
     border-radius: 4px 10px 10px 4px;
     background: var(--bg);
+    box-shadow: var(--shadow-sm);
     transition: all var(--transition);
 }
 
 .comp-item:hover {
     background: var(--bg-soft);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+    transform: translateY(-1px);
 }
 
 .comp-item.blue:hover {
