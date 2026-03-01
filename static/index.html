@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federated Health Data Lake — Architecture Overview</title>
+    <meta name="description"
+        content="Interactive architecture overview of the Federated Data Lake and Intelligence Healthcare Management System for Pakistan.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="canvas" id="canvas">
+        <!-- Thin top bar -->
+        <header class="topbar">
+            <span class="topbar-title">Federated Data Lake &amp; Intelligence — Healthcare Management System</span>
+            <span class="topbar-sub">Pakistan · Architecture Overview</span>
+        </header>
+
+        <!-- SVG Connector overlay -->
+        <svg id="connectors-svg" class="connectors-svg" aria-hidden="true"></svg>
+
+        <div class="grid-area">
+            <!-- ===== LEFT: CENTRAL CONTROL PLANE ===== -->
+            <section class="node-card central-node" id="central-node">
+                <div class="node-head">
+                    <span class="node-badge badge-blue">Central Control Plane</span>
+                    <p class="node-desc">Federation orchestration, query engine &amp; admin</p>
+                </div>
+                <div class="portal-list">
+                    <!-- REPLACE href WITH ACTUAL URL -->
+                    <a href="#HOSPITAL_REGISTRATION_PORTAL_URL" target="_blank" rel="noopener noreferrer"
+                        class="portal-link" id="portal-hosp-reg">
+                        <svg class="i" viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <line x1="19" y1="8" x2="19" y2="14" />
+                            <line x1="22" y1="11" x2="16" y2="11" />
+                        </svg>
+                        <span class="pl-text"><strong>Hospital Registration</strong><small>Register &amp; connect
+                                nodes</small>
+                            <span class="comp-tags"><span class="ctag blue">Central Backend</span><span
+                                    class="ctag blue">Central DB</span></span></span>
+                        <svg class="i i-go" viewBox="0 0 24 24">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
+                    </a>
+                    <!-- REPLACE href WITH ACTUAL URL -->
+                    <a href="#ADMIN_PORTAL_URL" target="_blank" rel="noopener noreferrer" class="portal-link"
+                        id="portal-admin">
+                        <svg class="i" viewBox="0 0 24 24">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        <span class="pl-text"><strong>Admin Portal</strong><small>Federation health &amp;
+                                monitoring</small>
+                            <span class="comp-tags"><span class="ctag blue">Central Backend</span><span
+                                    class="ctag blue">Central DB</span></span></span>
+                        <svg class="i i-go" viewBox="0 0 24 24">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
+                    </a>
+                    <!-- REPLACE href WITH ACTUAL URL -->
+                    <a href="#REQUESTER_PLATFORM_URL" target="_blank" rel="noopener noreferrer" class="portal-link"
+                        id="portal-requester">
+                        <svg class="i" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                        <span class="pl-text"><strong>Requester / Researcher</strong><small>Datasets, queries &amp;
+                                analytics</small>
+                            <span class="comp-tags"><span class="ctag blue">Trino Engine</span><span
+                                    class="ctag purple">AI Analytics</span></span></span>
+                        <svg class="i i-go" viewBox="0 0 24 24">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
+                    </a>
+                </div>
+                <button class="expand-btn" data-node="central" id="expand-central">
+                    <svg class="i" viewBox="0 0 24 24">
+                        <path
+                            d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+                        <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+                        <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
+                    </svg>
+                    Expand Architecture
+                </button>
+            </section>
+
+            <!-- ===== Connector labels ===== -->
+            <div class="conn-labels" id="conn-labels">
+                <div class="conn-label">Metadata Push · Query Dispatch · Request Sync</div>
+                <div class="conn-label">Metadata Push · Query Dispatch · Request Sync</div>
+            </div>
+
+            <!-- ===== RIGHT: HOSPITAL NODES ===== -->
+            <div class="hospital-stack">
+                <!-- Hospital Node A -->
+                <section class="node-card hospital-node" id="hospital-a-node">
+                    <div class="node-head">
+                        <span class="node-badge badge-teal">Hospital Node A</span>
+                        <span class="identical-tag">Identical Deployment</span>
+                    </div>
+                    <div class="portal-list">
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_A_BACKEND_UI_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-a-backend">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <path d="M8 21h8M12 17v4" />
+                            </svg>
+                            <span class="pl-text"><strong>Node Backend UI</strong><small>ETL &amp; federation
+                                    mgmt</small>
+                                <span class="comp-tags"><span class="ctag teal">ETL Server</span><span
+                                        class="ctag teal">MinIO</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_A_ADMIN_PORTAL_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-a-admin">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span class="pl-text"><strong>Clinical Admin</strong><small>Users, roles &amp;
+                                    config</small>
+                                <span class="comp-tags"><span class="ctag teal">Clinical Backend</span><span
+                                        class="ctag teal">Clinical DB</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_A_CLINICAL_PORTAL_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-a-clinical">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                            <span class="pl-text"><strong>Clinical Staff Portal</strong><small>Doctor · Patient ·
+                                    Receptionist · Pathologist · Lab Tech</small>
+                                <span class="comp-tags"><span class="ctag teal">Checkups MS</span><span
+                                        class="ctag teal">Lab Tests MS</span><span class="ctag purple">AI
+                                        Services</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                    </div>
+                    <button class="expand-btn teal" data-node="hospital-a" id="expand-hospital-a">
+                        <svg class="i" viewBox="0 0 24 24">
+                            <path
+                                d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+                            <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+                            <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
+                        </svg>
+                        Expand Architecture
+                    </button>
+                </section>
+
+                <!-- Hospital Node B -->
+                <section class="node-card hospital-node" id="hospital-b-node">
+                    <div class="node-head">
+                        <span class="node-badge badge-teal">Hospital Node B</span>
+                        <span class="identical-tag">Identical Deployment</span>
+                    </div>
+                    <div class="portal-list">
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_B_BACKEND_UI_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-b-backend">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <path d="M8 21h8M12 17v4" />
+                            </svg>
+                            <span class="pl-text"><strong>Node Backend UI</strong><small>ETL &amp; federation
+                                    mgmt</small>
+                                <span class="comp-tags"><span class="ctag teal">ETL Server</span><span
+                                        class="ctag teal">MinIO</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_B_ADMIN_PORTAL_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-b-admin">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span class="pl-text"><strong>Clinical Admin</strong><small>Users, roles &amp;
+                                    config</small>
+                                <span class="comp-tags"><span class="ctag teal">Clinical Backend</span><span
+                                        class="ctag teal">Clinical DB</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                        <!-- REPLACE href WITH ACTUAL URL -->
+                        <a href="#NODE_B_CLINICAL_PORTAL_URL" target="_blank" rel="noopener noreferrer"
+                            class="portal-link teal" id="portal-node-b-clinical">
+                            <svg class="i" viewBox="0 0 24 24">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                            <span class="pl-text"><strong>Clinical Staff Portal</strong><small>Doctor · Patient ·
+                                    Receptionist · Pathologist · Lab Tech</small>
+                                <span class="comp-tags"><span class="ctag teal">Checkups MS</span><span
+                                        class="ctag teal">Lab Tests MS</span><span class="ctag purple">AI
+                                        Services</span></span></span>
+                            <svg class="i i-go" viewBox="0 0 24 24">
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </a>
+                    </div>
+                    <button class="expand-btn teal" data-node="hospital-b" id="expand-hospital-b">
+                        <svg class="i" viewBox="0 0 24 24">
+                            <path
+                                d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+                            <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+                            <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
+                        </svg>
+                        Expand Architecture
+                    </button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-panel" id="modal-panel">
+            <button class="modal-close" id="modal-close" aria-label="Close">
+                <svg class="i" viewBox="0 0 24 24">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                </svg>
+            </button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>
