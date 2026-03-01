@@ -230,6 +230,7 @@ function hospitalModal(label, sfx, backendUrl, adminUrl, clinicalUrl) {
             <div class="comp-grid">
                 ${comp('server', 'Main Clinical Backend', 'Auth layer &amp; API gateway for operations', 'teal')}
                 ${comp('clipboard', 'Checkups Service', 'Patient checkups, appointments &amp; scheduling', 'teal')}
+                ${comp('clipboard', 'Lab Tests Service', 'Manage lab tests templates, perform tests &amp; store results', 'teal')}
                 ${comp('database', 'Clinical DB', 'Source database for ETL pipelines', 'teal')}
             </div>
         </div>
