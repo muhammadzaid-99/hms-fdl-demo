@@ -319,7 +319,7 @@ function hospitalModal(label, sfx, backendUrl, adminUrl, clinicalUrl) {
              <div class="m-section">
                 <div class="m-section-head teal">${icon('zap', 'i-sm')} Infrastructure Data Flows</div>
                 ${flow('f-' + sfx + '-etl', 'ETL Pipeline Execution Flow', [
-        ['Node Backend UI →', 'triggers ETL job'],
+        ['Node Console →', 'triggers ETL job'],
         ['ETL Server →', 'reads from Clinical DB'],
         ['ETL Server →', 'writes Iceberg data to MinIO'],
         ['ETL Server →', 'pushes metadata to Central Nessie Catalog'],
