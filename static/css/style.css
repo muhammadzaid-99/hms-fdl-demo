@@ -519,6 +519,15 @@ body::before {
     min-height: 0;
 }
 
+#modal-body::-webkit-scrollbar {
+    display: none;
+}
+
+#modal-body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 /* Modal Multi-Column Layout */
 .modal-cols {
     display: grid;
